@@ -148,8 +148,20 @@
         for (const p of particles) {
           p.node.x += p.vx;
           p.node.y += p.vy;
-          if (p.node.x < 0 || p.node.x > app.renderer.width) p.vx *= -1;
-          if (p.node.y < 0 || p.node.y > app.renderer.height) p.vy *= -1;
+          if (p.node.x < 0) {
+            p.node.x = 0;
+            p.vx *= -1;
+          } else if (p.node.x > app.renderer.width) {
+            p.node.x = app.renderer.width;
+            p.vx *= -1;
+          }
+          if (p.node.y < 0) {
+            p.node.y = 0;
+            p.vy *= -1;
+          } else if (p.node.y > app.renderer.height) {
+            p.node.y = app.renderer.height;
+            p.vy *= -1;
+          }
         }
       });
     });
