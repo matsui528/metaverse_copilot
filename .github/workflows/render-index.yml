@@ -39,8 +39,10 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
           git commit -m "chore: render index.html from papers.json"
+          branch="${GITHUB_REF_NAME}"
           for attempt in 1 2 3; do
-            git pull --rebase origin "${GITHUB_REF_NAME}" && git push && exit 0
+            git pull --rebase origin "$branch" && git push origin "HEAD:${branch}" && exit 0
+            echo "Push attempt ${attempt} failed; retrying..."
             if [ "$attempt" -eq 3 ]; then
               echo "Failed to push rendered index.html after retries."
               exit 1
