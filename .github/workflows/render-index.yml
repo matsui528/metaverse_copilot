@@ -1,0 +1,39 @@
+name: Render index.html
+
+on:
+  push:
+    paths:
+      - papers.json
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  render-index:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Render index.html
+        run: python build.py
+
+      - name: Commit rendered index.html
+        run: |
+          if git diff --quiet index.html; then
+            echo "No changes in index.html"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "chore: render index.html from papers.json"
+          git push
