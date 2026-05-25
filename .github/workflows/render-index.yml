@@ -19,8 +19,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -32,6 +30,7 @@ jobs:
 
       - name: Commit rendered index.html
         run: |
+          set -euo pipefail
           if [ -z "$(git status --porcelain -- index.html)" ]; then
             echo "No changes in index.html"
             exit 0
