@@ -3,7 +3,7 @@ name: Render index.html
 on:
   push:
     paths:
-      - papers.json
+      - "papers.json"
   workflow_dispatch:
 
 permissions:
@@ -39,5 +39,11 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
           git commit -m "chore: render index.html from papers.json"
-          git pull --rebase origin "${GITHUB_REF_NAME}"
-          git push
+          for attempt in 1 2 3; do
+            git pull --rebase origin "${GITHUB_REF_NAME}" && git push && exit 0
+            if [ "$attempt" -eq 3 ]; then
+              echo "Failed to push rendered index.html after retries."
+              exit 1
+            fi
+            sleep 2
+          done
