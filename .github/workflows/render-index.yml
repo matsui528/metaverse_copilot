@@ -1,0 +1,51 @@
+name: Render index.html
+
+on:
+  push:
+    paths:
+      - "papers.json"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: render-index-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  render-index:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Render index.html
+        run: python build.py
+
+      - name: Commit rendered index.html
+        run: |
+          set -euo pipefail
+          if [ -z "$(git status --porcelain -- index.html)" ]; then
+            echo "No changes in index.html"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "chore: render index.html from papers.json"
+          branch="${GITHUB_REF_NAME}"
+          for attempt in 1 2 3; do
+            git pull --rebase origin "$branch" && git push origin "HEAD:${branch}" && exit 0
+            echo "Push attempt ${attempt} failed; retrying..."
+            if [ "$attempt" -eq 3 ]; then
+              echo "Failed to push rendered index.html after retries."
+              exit 1
+            fi
+            sleep 2
+          done
