@@ -127,8 +127,20 @@
     }).then(() => {
       stageHost.appendChild(app.canvas);
 
+      const EDGE_EPSILON = 0.5;
+      const MIN_VELOCITY = 0.15;
+      const randomVelocity = () => {
+        const base = 0.35 + Math.random() * 0.35;
+        const direction = Math.random() < 0.5 ? -1 : 1;
+        return base * direction;
+      };
+      const ensureMinimumVelocity = (value) => {
+        if (Math.abs(value) >= MIN_VELOCITY) return value;
+        return MIN_VELOCITY * (value < 0 ? -1 : 1);
+      };
+
       const particles = [];
-      for (let i = 0; i < 80; i += 1) {
+      for (let particleIndex = 0; particleIndex < 80; particleIndex += 1) {
         const particle = new PIXI.Graphics()
           .circle(0, 0, 2 + Math.random() * 3)
           .fill(0x7af7ff);
@@ -138,8 +150,8 @@
         app.stage.addChild(particle);
         particles.push({
           node: particle,
-          vx: -0.35 + Math.random() * 0.7,
-          vy: -0.35 + Math.random() * 0.7
+          vx: randomVelocity(),
+          vy: randomVelocity()
         });
       }
 
@@ -148,18 +160,18 @@
           p.node.x += p.vx;
           p.node.y += p.vy;
           if (p.node.x < 0) {
-            p.node.x = 0;
-            p.vx *= -1;
+            p.node.x = EDGE_EPSILON;
+            p.vx = ensureMinimumVelocity(Math.abs(p.vx));
           } else if (p.node.x > app.renderer.width) {
-            p.node.x = app.renderer.width;
-            p.vx *= -1;
+            p.node.x = app.renderer.width - EDGE_EPSILON;
+            p.vx = ensureMinimumVelocity(-Math.abs(p.vx));
           }
           if (p.node.y < 0) {
-            p.node.y = 0;
-            p.vy *= -1;
+            p.node.y = EDGE_EPSILON;
+            p.vy = ensureMinimumVelocity(Math.abs(p.vy));
           } else if (p.node.y > app.renderer.height) {
-            p.node.y = app.renderer.height;
-            p.vy *= -1;
+            p.node.y = app.renderer.height - EDGE_EPSILON;
+            p.vy = ensureMinimumVelocity(-Math.abs(p.vy));
           }
         }
       });
