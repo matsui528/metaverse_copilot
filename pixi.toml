@@ -1,0 +1,11 @@
+[project]
+name = "metaverse_copilot"
+version = "0.1.0"
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-arm64", "osx-64", "win-64"]
+
+[tasks]
+render = "python build.py"
+
+[dependencies]
+python = ">=3.11,<3.14"
