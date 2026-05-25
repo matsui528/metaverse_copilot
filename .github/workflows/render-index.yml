@@ -9,6 +9,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: render-index-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   render-index:
     runs-on: ubuntu-latest
@@ -28,7 +32,7 @@ jobs:
 
       - name: Commit rendered index.html
         run: |
-          if git diff --quiet index.html; then
+          if [ -z "$(git status --porcelain -- index.html)" ]; then
             echo "No changes in index.html"
             exit 0
           fi
@@ -36,4 +40,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
           git commit -m "chore: render index.html from papers.json"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
           git push
