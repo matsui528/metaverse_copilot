@@ -8,5 +8,10 @@
     "title": "Super strong ResNet",
     "author": "Taro Hongo and Fuga Piyo",
     "conf": "CVPR 2026"
+  },
+  {
+    "title": "SIFT is all you need",
+    "author": "Taro Hongo and Jiro Komaba and Hanako Kashiwa",
+    "conf": "NeurIPS 2026"
   }
 ]
